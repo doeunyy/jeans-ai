@@ -1,0 +1,2 @@
+whisper/dataset/audio_path_train.csv filter=lfs diff=lfs merge=lfs -text
+whisper/dataset/dataset_train.csv filter=lfs diff=lfs merge=lfs -text
