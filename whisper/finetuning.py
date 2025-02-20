@@ -2,35 +2,50 @@
 Fine-tuning whisper (possible: tiny, small, medium, etc.)
 
 References:
-    - Master reference:
+    - Master reference: https://huggingface.co/blog/fine-tune-whisper
 
 Written by: Doeun Kim
 Licence: MIT
 '''
 
 import argparse
-from datasets import load_dataset, DatasetDict
-from trainer.collator import DataCollatorSpeechSeq2SeqWithPadding
-from utils import get_unique_directory
-from transformers import ( WhisperFeatureExtractor, WhisperTokenizer, WhisperProcessor, WhisperForConditionalGeneration )
-from scipy.io.wavfile import read
 import numpy as np
 import os
 import evaluate
+from datasets import load_dataset, DatasetDict, Dataset
+from trainer.collator import DataCollatorSpeechSeq2SeqWithPadding
+from utils import get_unique_directory
+from transformers import ( 
+    WhisperFeatureExtractor, 
+    WhisperTokenizer, 
+    WhisperProcessor, 
+    WhisperForConditionalGeneration, 
+    Seq2SeqTrainingArguments,
+    Seq2SeqTrainer
+) 
+from scipy.io.wavfile import read
+from sklearn.model_selection import train_test_split
+from pprint import pprint
 
-def get_config() -> argparse.ArgumentParser:
+def get_config():
     '''Whisper finetuning args parsing functoin'''
     parser = argparse.ArgumentParser()
     
     ## dataset
     parser.add_argument(
         '--train-set', '-t',
-        # required=True,
+        required=True,
         help='Training dataset name (file name or file path)'
     )
     parser.add_argument(
         '--valid-set', '-v',
+        required=True,
+        help='Validation dataset name (file name or file path)'
+    )
+    parser.add_argument(
+        '--test-set', '-e',
         # required=True,
+        default='C:/Users/004/Desktop/Jeans/AI/whisper/dataset/dataset_test.csv',
         help='Validation dataset name (file name or file path)'
     )
     
@@ -94,6 +109,7 @@ class Trainer:
 
     def __init__(self, config) -> None:
         '''Init all required args for whisper finetune'''
+        
         self.config = config
 
         # 사전 학습 모델 -> 2개
@@ -139,34 +155,66 @@ class Trainer:
             task=config.task,
         )
         
-        # model
+        # Model
         self.model = WhisperForConditionalGeneration.from_pretrained(self.pretrained_model)
         
-        # collator
+        # Label collator
         self.data_collator = DataCollatorSpeechSeq2SeqWithPadding(
             processor=self.processor,
             decoder_start_token_id=self.model.config.decoder_start_token_id,
         )
 
+        # Training args 
+        self.training_args = Seq2SeqTrainingArguments(
+            output_dir=self.output_dir,     # change to a repo name of your choice
+            per_device_train_batch_size=16, # GPU 성능에 다라 16 -> 32 변경 가능
+            gradient_accumulation_steps=1,  # increase by 2x for every 2x decrease in batch size
+            learning_rate=1e-5,     
+            warmup_steps=500,               # gradient exploding 방지를 위한 warm-up 과정
+            # max_steps=5000,
+            gradient_checkpointing=True,
+            fp16=True,                      # 부동 소수점 자리 수 (default: fp32 -> fp16 - speed-up training)
+            eval_strategy="steps",    
+            per_device_eval_batch_size=8,   # GPU 성능에 따라 8 -> 16 -> 32 변경 가능
+            predict_with_generate=True,
+            generation_max_length=225,
+            save_steps=1000,
+            eval_steps=1000,
+            logging_steps=100,               # 25 -> 100으로 변경함
+            # report_to=["tensorboard"],
+            load_best_model_at_end=True,
+            metric_for_best_model=config.metric,
+            greater_is_better=False,
+            push_to_hub=False,
+        )
+
+
     def load_dataset(self, ) -> DatasetDict:
         '''Load dataset containing tain/valid/test'''
         dataset = DatasetDict()
-        
-        # os에 따른 인식 오류 방지
-        train_path = os.path.join(os.path.dirname(__file__), "dataset", "dataset_train.csv")
-        valid_path = os.path.join(os.path.dirname(__file__), "dataset", "dataset_val.csv")
+
+        # 상대 경로 -> 절대 경로로 변환
+        train_path = os.path.abspath(self.config.train_set)
+        valid_path = os.path.abspath(self.config.valid_set)
+        test_path = os.path.abspath(self.config.test_set)
+
+        print(f"Resolved Train Path: {train_path}")
+        print(f"Resolved Valid Path: {valid_path}")
+        print(f"Resolved Test Path: {test_path}")
         
         dataset['train'] = load_dataset(
-            path='csv', 
-            # name='aihub-ko',    # (Optional) 사용자가 지정하는 이름
+            path='csv',
             split='train',
-            # data_files=self.config.train_set)
             data_files=train_path)
         dataset['valid'] = load_dataset(
             path='csv', 
-            # name='aihub-ko',    # (Optional) 사용자가 지정하는 이름
             split='train',
             data_files=valid_path)
+        dataset['test'] = load_dataset(
+            path='csv', 
+            split='train',
+            data_files=test_path)
+        
         return dataset
 
     def compute_metrics(self, pred) -> dict:
@@ -205,18 +253,32 @@ class Trainer:
     def process_dataset(self, dataset) -> tuple:
         '''Process loaded dataset applying prepare_dataset)'''
         # common_voice = common_voice.map(prepare_dataset, remove_columns=common_voice.column_names["train"], num_proc=4)
+        
+        print('\nStart train dataset mapping...')
+        print(dataset['train'])
         train = dataset['train'].map(
             function=self.prepare_dataset,
-            remove_columns=dataset['train'].column_names,
-            num_proc=8
-        )
-        valid = dataset['valid'].map(
-            function=self.prepare_dataset,
-            remove_columns=dataset['valid'].column_names,
-            num_proc=8
+            remove_columns=dataset.column_names['train'],
+            num_proc=4
         )
         
-        return (train, valid)
+        print('\nStart valid dataset mapping...')
+        print(dataset['valid'])
+        valid = dataset['valid'].map(
+            function=self.prepare_dataset,
+            remove_columns=dataset.column_names['valid'],
+            num_proc=4
+        )
+        
+        print('\nStart test dataset mapping...')
+        print(dataset['test'])
+        test = dataset['test'].map(
+            function=self.prepare_dataset,
+            remove_columns=dataset.column_names['test'],
+            num_proc=4
+        )
+        
+        return (train, valid, test)
 
     def enforce_finetune_lang(self) -> None:
         '''Enforce finetuning language'''
@@ -233,17 +295,49 @@ class Trainer:
         
     def create_trainer(self, train, valid) -> None:
         '''Create seq2seq trainer'''
-        pass
+        trainer = Seq2SeqTrainer(
+            args=self.training_args,
+            model=self.model,
+            train_dataset=train,
+            eval_dataset=valid,
+            data_collator=self.data_collator,
+            compute_metrics=self.compute_metrics,
+            tokenizer=self.processor.feature_extractor,
+        )
+        
+        return trainer
 
     def run(self) -> None:
         '''Run trainer'''
-        pass
+        self.enforce_finetune_lang()
+        dataset = self.load_dataset()
+        train, valid, test = self.process_dataset(dataset)
+        trainer = self.create_trainer(train, valid)
+        
+        # 모델 학습 시작
+        print('\nStart fine-tuning...')
+        trainer.train()
+        trainer.save_model(self.finetuned_model_dir)
+        
+        # 모델 성능 평가
+        print('\nStart testing performance using test_dataset...')
+        result_dic = trainer.evaluate(eval_dataset=test)
+        pprint(result_dic)
+        
+        print('\nClearing GPU cache')
+        torch.cuda.empty_cache()
+        print('\nFine-tuning is done!')
 
 if __name__ == '__main__':
     config = get_config()
-    trainer = Trainer(config)
-    # trainer.run()
-    dataset = trainer.load_dataset()
+    trainer = Trainer(config=config)
+    # dataset = trainer.load_dataset()
+    # print(dataset)
+    # train, valid, test = trainer.process_dataset(dataset)
+    
+    trainer.run()
+    
+    # dataset = trainer.load_dataset()
     
     # # [Test code] Tokenizer 작동 확인
     # print(dataset)
@@ -260,4 +354,4 @@ if __name__ == '__main__':
     # print(f'\nIs equal:\t {input_str == decoded_str_without_special_tokens}')
     
     # [Test code] Prepare & Process 
-    train, valid = trainer.process_dataset(dataset)
+    # train, valid = trainer.process_dataset(dataset)
