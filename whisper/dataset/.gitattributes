@@ -1,1 +1,4 @@
 dataset_train_updated.csv filter=lfs diff=lfs merge=lfs -text
+backup/*.csv filter=lfs diff=lfs merge=lfs -text
+backup/dataset_train.csv filter=lfs diff=lfs merge=lfs -text
+backup/audio_path_train.csv filter=lfs diff=lfs merge=lfs -text
