@@ -40,6 +40,7 @@ async def classify_function(text: str) -> str:
                 "role": "system",
                 "content": "사용자의 요청이 어떤 기능인지 분석하세요."
                             "아래의 기능 중 하나의 단어만 반환하세요.\n"
+                            "- 홈 화면 조회: home\n"
                             "- 친구 목록 조회: view_friends_list\n"
                             "- 친구 삭제: delete_friend\n"
                             "- 친구 요청 수락: accept_friend_request\n"
