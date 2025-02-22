@@ -40,8 +40,8 @@ async def process_accept_friend_request(text: str, functions: list) -> dict:
         # target_name = request_text.split(" ")[0] if request_text else None  # 친구 이름 추출
 
         return {
-            "text": text,
-            "function_call": function_call_result,
+            # "text": text,
+            # "function_call": function_call_result,
             "target_name": target_name,
         }
 

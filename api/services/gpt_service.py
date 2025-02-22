@@ -10,16 +10,17 @@ async def process_with_functions(text: str, functions: list) -> dict:
     try:
         function_type = await classify_function(text)   # 기능 판별
         handler = get_function_handler(function_type)   # 기능 핸들러 가져오기
-        front_path = get_front_path(function_type)      # 기능 path 가져오기
+        action, front_path = get_front_path(function_type)      # 기능 path 가져오기
         
         print(f"🔍 [DEBUG] 기능 판별 결과: {function_type}, Front Path: {front_path}")  # 디버깅 로그
         
         if handler:
             response = await handler(text, functions)   # 해당 기능 실행
+            response["action"] = action                 # action 추가                
             response["path"] = front_path               # path 추가
             return response
         elif front_path:  # 핸들러가 없어도 front_path가 있으면 반환
-            return {"path": front_path}
+            return {"action": action, "path": front_path}
         else:
             return {"error": f"'{function_type}'에 대한 처리 핸들러 또는 경로가 없습니다."}
 

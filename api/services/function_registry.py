@@ -45,8 +45,8 @@ def get_function_handler(function_name: str):
     """
     return FUNCTION_MAPPINGS.get(function_name)
 
-def get_front_path(function_name: str) -> str:
+def get_front_path(function_name: str):
     """
-    기능 이름을 받아 해당 front-end path를 반환.
+    기능 이름을 받아 해당 front-end path의 key와 value를 반환.
     """
-    return FRONT_PATHS.get(function_name, "")  # 기본값은 빈 문자열
+    return (function_name, FRONT_PATHS.get(function_name, ""))  # 기본값은 빈 문자열
