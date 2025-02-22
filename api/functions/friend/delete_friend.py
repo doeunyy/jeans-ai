@@ -1,3 +1,4 @@
+import re
 import json
 from openai import AsyncOpenAI
 from api.config import settings
@@ -28,7 +29,13 @@ async def process_delete_friend(text: str, functions: list) -> dict:
             arguments = {}
 
         request_text = arguments.get("request", text)
-        target_name = request_text.split(" ")[0] if request_text else None  # 친구 이름 추출
+        
+        # 친구 이름 뒤의 "을" 제거
+        match = re.search(r"([\w가-힣]+)을", request_text)
+        if match:
+            target_name = match.group(1)
+        else:
+            target_name = request_text.split(" ")[0] if request_text else None
 
         return {
             # "text": text,
