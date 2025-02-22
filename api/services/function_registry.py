@@ -1,12 +1,18 @@
-from api.services.delete_friend import process_delete_friend
-from api.services.search_photo import process_photo_search
-from api.services.accept_friend_request import process_accept_friend_request
+from api.functions.friend.delete_friend import process_delete_friend
+from api.functions.friend.accept_friend_request import process_accept_friend_request
+from api.functions.search.search_photo import process_photo_search
+
 
 # 기능별 처리 함수 매핑
 FUNCTION_MAPPINGS = {
-    "delete_friend": process_delete_friend,
-    "search_photo": process_photo_search,
+    ### 친구
     "accept_friend_request": process_accept_friend_request,
+    "delete_friend": process_delete_friend,
+    # "view_friends_list": process_get_friend_list,
+    
+    ### 검색
+    "search_photo": process_photo_search,
+    
     # 추가 기능이 있다면 여기에 추가
 }
 
@@ -21,7 +27,9 @@ FRONT_PATHS = {
     "view_manual": "/MyPage/manual",
     "logout": "/explore",
     "quit": "/MyPage/quit",
-    "search": "/Home/search",
+    "search_photo": "/Home/search",
+    
+    ### 친구
     "view_friends_list": "/Friend/list",
     "send_friend_request": "/Friend/send-search",
     "accept_friend_request": "/Friend/receive",

@@ -12,7 +12,7 @@
         "type": "string",
         "description": "검색할 키워드"
       },
-      "user": {
+      "target_name": {
         "type": "string",
         "description": "사용자 이름 (선택적)"
       }
