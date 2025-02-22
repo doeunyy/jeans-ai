@@ -1,15 +1,22 @@
 {
-  "name": "home_newsfeed",
+  "name": "home",
   "description": "친구 소식 탭(홈 화면)으로 이동하는 기능",
   "parameters": {
     "type": "object",
     "properties": {
-      "intent": {
+      "request": {
         "type": "string",
-        "description": "사용자의 요청 의도",
-        "enum": ["go_to_home"]
+        "description": "홈 화면으로 이동 요청 문장"
       }
-    },
-    "required": ["intent"]
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      }
+    }
   }
 }
