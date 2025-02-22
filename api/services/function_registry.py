@@ -21,6 +21,9 @@ FUNCTION_MAPPINGS = {
 FRONT_PATHS = {
     ### 홈
     "home": "/Home/main-page",
+    
+    ### 검색
+    "search_photo": "/Home/search",
 
     "edit_info": "/MyPage/edit-info",
     "edit_profile_photo": "/MyPage/edit-info",
@@ -31,14 +34,15 @@ FRONT_PATHS = {
     "view_manual": "/MyPage/manual",
     "logout": "/explore",
     "quit": "/MyPage/quit",
-    "search_photo": "/Home/search",
     
     ### 친구
     "view_friends_list": "/Friend/list",
     "send_friend_request": "/Friend/send-search",
     "accept_friend_request": "/Friend/receive",
     "delete_friend": "/Friend/delete",
-    "share": "/Share/share-select-img",
+    
+    ### 공유
+    "share": "/Share/share-select-img"
 }
 
 
