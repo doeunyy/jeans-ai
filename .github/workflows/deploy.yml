@@ -1,0 +1,32 @@
+name: Deploy FastAPI to AWS
+
+on:
+  push:
+    branches:
+      - develop  # develop 브랜치로 머지 시 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.AWS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: SSH into AWS and Deploy
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.AWS_HOST }} << 'EOF'
+            cd /home/ubuntu/fastapi_project
+            git remote set-url origin git@github.com:doeunyy/ci-cd-test-repo.git
+            git pull origin $(git rev-parse --abbrev-ref HEAD)  # 현재 브랜치 자동 감지
+            source fastapi_env/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart fastapi
+          EOF
