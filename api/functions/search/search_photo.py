@@ -36,7 +36,7 @@ async def process_photo_search(text: str, functions: list) -> dict:
 
         date = arguments.get("date", "")
         keyword = arguments.get("keyword", "")
-        user = arguments.get("user", None)
+        target_name = arguments.get("target_name", None)
 
         kst = pytz.timezone("Asia/Seoul")
         today = datetime.now(kst).date()
@@ -58,7 +58,7 @@ async def process_photo_search(text: str, functions: list) -> dict:
             "date_start": date_start,
             "date_end": date_end,
             "keyword": keyword,
-            "user": user
+            "target_name": target_name
         }
 
     except Exception as e:
