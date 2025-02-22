@@ -15,7 +15,7 @@ app.add_middleware(
 
 @app.get("/")
 async def home():
-    return {"message": "Hi"}
+    return {"message": "🚀🚀 Let's go Passion-4"}
 
 app.include_router(api.router, prefix="/api")
 
