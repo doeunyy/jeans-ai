@@ -43,6 +43,7 @@ async def classify_function(text: str) -> str:
                             "- 친구 목록 조회: view_friends_list\n"
                             "- 친구 삭제: delete_friend\n"
                             "- 친구 요청 수락: accept_friend_request\n"
+                            "- 친구 요청 전송: send_friend_request\n"
                             "- 사진 검색: search_photo\n" 
                             #! 여기에 계속 추가해야함 
                             "반환할 때 단어 하나만 반환하세요. "
