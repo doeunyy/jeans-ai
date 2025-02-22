@@ -1,0 +1,26 @@
+{
+  "name": "receive_friend_request",
+  "description": "친구 요청 수락 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "description": "친구 요청 수락 요청 문장"
+      }
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      },
+      "target_name": {
+        "type": "string",
+        "description": "수락할 친구의 이름"
+      }
+    }
+  }
+}

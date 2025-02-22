@@ -1,0 +1,26 @@
+{
+  "name": "delete_friend",
+  "description": "친구 삭제 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "description": "친구 삭제 요청 문장"
+      }
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      },
+      "target_name": {
+        "type": "string",
+        "description": "삭제할 친구 이름"
+      }
+    }
+  }
+}

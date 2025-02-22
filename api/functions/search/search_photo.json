@@ -1,0 +1,22 @@
+{
+  "name": "search_photo",
+  "description": "사진 검색 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "date": {
+        "type": "string",
+        "description": "사진 촬영 날짜 (YYYY-MM-DD 형식)"
+      },
+      "keyword": {
+        "type": "string",
+        "description": "검색할 키워드"
+      },
+      "user": {
+        "type": "string",
+        "description": "사용자 이름 (선택적)"
+      }
+    },
+    "required": ["date", "keyword"]
+  }
+}
