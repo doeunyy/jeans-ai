@@ -1,4 +1,5 @@
 from api.functions.friend.delete_friend import process_delete_friend
+from api.functions.friend.send_friend_request import process_send_friend_request
 from api.functions.friend.accept_friend_request import process_accept_friend_request
 from api.functions.search.search_photo import process_photo_search
 
@@ -6,6 +7,7 @@ from api.functions.search.search_photo import process_photo_search
 # 기능별 처리 함수 매핑
 FUNCTION_MAPPINGS = {
     ### 친구
+    "send_friend_request": process_send_friend_request,
     "accept_friend_request": process_accept_friend_request,
     "delete_friend": process_delete_friend,
     
@@ -17,6 +19,12 @@ FUNCTION_MAPPINGS = {
 
 # 기능별 front-end path 매핑
 FRONT_PATHS = {
+    ### 홈
+    "home": "/Home/main-page",
+    
+    ### 검색
+    "search_photo": "/Home/search",
+
     "edit_info": "/MyPage/edit-info",
     "edit_profile_photo": "/MyPage/edit-info",
     "edit_name": "/MyPage/edit-info",
@@ -26,13 +34,15 @@ FRONT_PATHS = {
     "view_manual": "/MyPage/manual",
     "logout": "/explore",
     "quit": "/MyPage/quit",
-    "search_photo": "/Home/search",
+    
+    ### 친구
     "view_friends_list": "/Friend/list",
     "send_friend_request": "/Friend/send-search",
     "accept_friend_request": "/Friend/receive",
     "delete_friend": "/Friend/delete",
-    "share": "/Share/share-select-img",
-    "home_newsfeed": "/Home/main-page",
+    
+    ### 공유
+    "share": "/Share/share-select-img"
 }
 
 
@@ -42,8 +52,8 @@ def get_function_handler(function_name: str):
     """
     return FUNCTION_MAPPINGS.get(function_name)
 
-def get_front_path(function_name: str) -> str:
+def get_front_path(function_name: str):
     """
-    기능 이름을 받아 해당 front-end path를 반환.
+    기능 이름을 받아 해당 front-end path의 key와 value를 반환.
     """
-    return FRONT_PATHS.get(function_name, "")  # 기본값은 빈 문자열
+    return (function_name, FRONT_PATHS.get(function_name, ""))  # 기본값은 빈 문자열

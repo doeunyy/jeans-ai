@@ -1,0 +1,22 @@
+{
+  "name": "home",
+  "description": "친구 소식 탭(홈 화면)으로 이동하는 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "description": "홈 화면으로 이동 요청 문장"
+      }
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      }
+    }
+  }
+}

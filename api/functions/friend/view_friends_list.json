@@ -1,0 +1,29 @@
+{
+  "name": "get_friend_list",
+  "description": "친구 목록 조회 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "description": "친구 목록 조회 요청 문장"
+      }
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      },
+      "friend_list": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "조회된 친구 목록"
+      }
+    }
+  }
+}

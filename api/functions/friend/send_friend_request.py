@@ -6,7 +6,7 @@ from api.config import settings
 
 client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
-async def process_accept_friend_request(text: str, functions: list) -> dict:
+async def process_send_friend_request(text: str, functions: list) -> dict:
     """
     친구 요청 수락 기능을 처리하는 함수.
     """
@@ -14,7 +14,7 @@ async def process_accept_friend_request(text: str, functions: list) -> dict:
         response = await client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "사용자의 요청을 이해하고 친구 요청 수락 기능을 실행하세요."},
+                {"role": "system", "content": "사용자의 요청을 이해하고 친구 요청 전송 기능을 실행하세요."},
                 {"role": "user", "content": text}
             ],
             functions=functions,
@@ -29,15 +29,12 @@ async def process_accept_friend_request(text: str, functions: list) -> dict:
             arguments = {}
 
         request_text = arguments.get("request", text)
-        
-        # 정규식을 이용하여 친구 이름 뒤의 "의" 제거
-        match = re.search(r"([\w가-힣]+)의", request_text)
+    
+        match = re.search(r"([\w가-힣]+)에게", request_text)
         if match:
-            target_name = match.group(1) #"김도은의 - 김도은" 으로 변환
+            target_name = match.group(1) #"김도은에게 - 김도은" 으로 변환
         else:
             target_name = request_text.split(" ")[0] if request_text else None # 기본 철
-        
-        # target_name = request_text.split(" ")[0] if request_text else None  # 친구 이름 추출
 
         return {
             # "text": text,

@@ -1,0 +1,22 @@
+{
+  "name": "share_photo",
+  "description": "사용자가 선택한 사진을 특정 대상에게 공유하는 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "description": "사진 공유 요청 문장"
+      }
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      }
+    }
+  }
+}
