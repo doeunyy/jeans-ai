@@ -51,6 +51,8 @@ async def classify_function(text: str) -> str:
                             "- 프로필 사진 변경: change_profile_photo\n"
                             "- 이름 변경: change_name\n"
                             "- 비밀번호 변경: change_password\n"          
+                            "- 로그아웃: logout\n"          
+                            "- 탈퇴: quit\n"          
                             #! 여기에 계속 추가해야함 
                             "반환할 때 단어 하나만 반환하세요. "
             },
