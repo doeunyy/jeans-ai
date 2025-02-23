@@ -41,6 +41,7 @@ async def classify_function(text: str) -> str:
                 "content": "사용자의 요청이 어떤 기능인지 분석하세요."
                             "아래의 기능 중 하나의 단어만 반환하세요.\n"
                             "- 홈 화면 조회: home\n"
+                            "- 사진 편집: photo_editing\n"
                             "- 사진 검색: search_photo\n"
                             "- 공유: share\n"
                             "- 친구 목록 조회: view_friends_list\n"
