@@ -24,6 +24,12 @@ FRONT_PATHS = {
     ### 홈
     "home": "/Home/main-page",
     
+    ### 사진 편집
+    "photo_editing": "/Makeup/select-function",
+    "bestcut": "",
+    "default_correction": "",
+    "quote_generation": "",
+    
     ### 검색
     "search_photo": "/Home/search",
     
