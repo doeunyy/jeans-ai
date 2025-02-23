@@ -44,6 +44,8 @@ FRONT_PATHS = {
     "adjust_correction_value": "/Set/photo-selection0",
     "adjust_font_size": "/MyPage/word-size",
     "view_manual": "/MyPage/manual",
+    
+    ### 로그아웃/탈퇴
     "logout": "/explore",
     "quit": "/MyPage/quit",
 }
