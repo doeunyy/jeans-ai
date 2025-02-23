@@ -8,8 +8,10 @@ Written by: Doeun Kim
 Licence: MIT
 '''
 
+import torch
 import argparse
 import numpy as np
+import re
 import os
 import evaluate
 from datasets import load_dataset, DatasetDict, Dataset
@@ -167,7 +169,7 @@ class Trainer:
         # Training args 
         self.training_args = Seq2SeqTrainingArguments(
             output_dir=self.output_dir,     # change to a repo name of your choice
-            per_device_train_batch_size=16, # GPU 성능에 다라 16 -> 32 변경 가능
+            per_device_train_batch_size=32, # GPU 성능에 따라 16 -> 32 변경 가능
             gradient_accumulation_steps=1,  # increase by 2x for every 2x decrease in batch size
             learning_rate=1e-5,     
             warmup_steps=500,               # gradient exploding 방지를 위한 warm-up 과정
@@ -175,11 +177,11 @@ class Trainer:
             gradient_checkpointing=True,
             fp16=True,                      # 부동 소수점 자리 수 (default: fp32 -> fp16 - speed-up training)
             eval_strategy="steps",    
-            per_device_eval_batch_size=8,   # GPU 성능에 따라 8 -> 16 -> 32 변경 가능
+            per_device_eval_batch_size=16,   # GPU 성능에 따라 8 -> 16 -> 32 변경 가능
             predict_with_generate=True,
             generation_max_length=225,
-            save_steps=1000,
-            eval_steps=1000,
+            save_steps=60, #5000
+            eval_steps=20, #2000
             logging_steps=100,               # 25 -> 100으로 변경함
             # report_to=["tensorboard"],
             load_best_model_at_end=True,
@@ -252,7 +254,6 @@ class Trainer:
 
     def process_dataset(self, dataset) -> tuple:
         '''Process loaded dataset applying prepare_dataset)'''
-        # common_voice = common_voice.map(prepare_dataset, remove_columns=common_voice.column_names["train"], num_proc=4)
         
         print('\nStart train dataset mapping...')
         print(dataset['train'])
@@ -316,7 +317,22 @@ class Trainer:
         
         # 모델 학습 시작
         print('\nStart fine-tuning...')
+        
+        ## 최신 체크포인트 자동 지정
+        # latest_checkpoint = self.get_latest_checkpoint(self.output_dir)
+        # if latest_checkpoint:
+        #     print(f"\nResuming training from latest checkpoint: {latest_checkpoint}")
+        # else:
+        #     print("\nNo checkpoint found. Training from scratch.")
+
+        # trainer.train(resume_from_checkpoint=latest_checkpoint if latest_checkpoint else None)
+        
+        # 체크포인트 수동 지정
+        # latest_checkpoint = "./model_output/whisper-small-2025-02-20_1901/checkpoint-23922"
+        # print(f"\nResuming training from checkpoint: {latest_checkpoint}")
+        trainer.train(resume_from_checkpoint=latest_checkpoint if latest_checkpoint else None) 
         trainer.train()
+        
         trainer.save_model(self.finetuned_model_dir)
         
         # 모델 성능 평가
@@ -331,13 +347,12 @@ class Trainer:
 if __name__ == '__main__':
     config = get_config()
     trainer = Trainer(config=config)
+    trainer.run()
+    
+    # [Test code] Prepare & Process
     # dataset = trainer.load_dataset()
     # print(dataset)
     # train, valid, test = trainer.process_dataset(dataset)
-    
-    trainer.run()
-    
-    # dataset = trainer.load_dataset()
     
     # # [Test code] Tokenizer 작동 확인
     # print(dataset)
@@ -351,7 +366,4 @@ if __name__ == '__main__':
     # decoded_str_without_special_tokens = trainer.tokenizer.decode(labels, skip_special_tokens=True)
     # print(f"\ndecoded_str_with_special_tokens:\t {decoded_str_with_special_tokens}")
     # print(f"\ndecoded_str_without_special_tokens:\t {decoded_str_without_special_tokens}")
-    # print(f'\nIs equal:\t {input_str == decoded_str_without_special_tokens}')
-    
-    # [Test code] Prepare & Process 
-    # train, valid = trainer.process_dataset(dataset)
+    # print(f'\nIs equal:\t {input_str == decoded_str_without_special_tokens}') 
