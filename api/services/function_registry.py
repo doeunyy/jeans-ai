@@ -14,6 +14,8 @@ FUNCTION_MAPPINGS = {
     ### 검색
     "search_photo": process_photo_search,
     
+    ### 설정
+    
     # 추가 기능이 있다면 여기에 추가
 }
 
@@ -24,16 +26,9 @@ FRONT_PATHS = {
     
     ### 검색
     "search_photo": "/Home/search",
-
-    "edit_info": "/MyPage/edit-info",
-    "edit_profile_photo": "/MyPage/edit-info",
-    "edit_name": "/MyPage/edit-info",
-    "change_password": "/ChangePassword/origin-password",
-    "adjust_correction_value": "/Set/photo-selection0",
-    "adjust_font_size": "/MyPage/word-size",
-    "view_manual": "/MyPage/manual",
-    "logout": "/explore",
-    "quit": "/MyPage/quit",
+    
+    ### 공유
+    "share": "/Share/share-select-img",
     
     ### 친구
     "view_friends_list": "/Friend/list",
@@ -41,8 +36,16 @@ FRONT_PATHS = {
     "accept_friend_request": "/Friend/receive",
     "delete_friend": "/Friend/delete",
     
-    ### 공유
-    "share": "/Share/share-select-img"
+    ### 설정
+    "edit_user_info": "/MyPage/edit-info",
+    "change_profile_photo": "/MyPage/edit-info",
+    "change_name": "/MyPage/edit-info",
+    "change_password": "/ChangePassword/origin-password",
+    "adjust_correction_value": "/Set/photo-selection0",
+    "adjust_font_size": "/MyPage/word-size",
+    "view_manual": "/MyPage/manual",
+    "logout": "/explore",
+    "quit": "/MyPage/quit",
 }
 
 

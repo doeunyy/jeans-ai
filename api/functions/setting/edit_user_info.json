@@ -1,0 +1,23 @@
+{
+  "name": "navigate_to_user_info_settings",
+  "description": "내 정보 수정 내 원하는 기능 화면으로의 이동 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "description": "내 정보 수정 요청 문장",
+        "enum": ["edit_user_info", "change_profile_photo", "change_name", "change_password"]
+      }
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      }
+    }
+  }
+}
