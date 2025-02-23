@@ -1,0 +1,22 @@
+{
+  "name": "adjust_font_size",
+  "description": "폰트 크기 변경 화면으로의 이동 기능",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "request": {
+        "type": "string",
+        "description": "글씨 크기 변경 요청 문장"
+      }
+    }
+  },
+  "response": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "수행할 동작"
+      }
+    }
+  }
+}

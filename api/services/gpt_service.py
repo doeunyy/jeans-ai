@@ -52,6 +52,7 @@ async def classify_function(text: str) -> str:
                             "- 이름 변경: change_name\n"
                             "- 비밀번호 변경: change_password\n"          
                             "- 보정값 변경: adjust_correction_value\n"          
+                            "- 글씨 크기 변경: adjust_font_size\n"          
                             "- 로그아웃: logout\n"          
                             "- 탈퇴: quit\n"          
                             #! 여기에 계속 추가해야함 
