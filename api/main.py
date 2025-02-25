@@ -15,10 +15,9 @@ app.add_middleware(
 
 @app.get("/")
 async def home():
-    return {"message": "🚀🚀 Let's go Passion-4 - Deployment test Successful!"}
+    return {"message": "🚀🚀 열정 4팀 화이팅!!!!!"}
 
 app.include_router(api.router, prefix="/api")
-
 
 if __name__ == "__main__":
     import uvicorn
