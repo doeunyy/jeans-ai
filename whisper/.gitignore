@@ -1,0 +1,4 @@
+whisper_env/
+.ipynb_checkpoints/
+**/__pycache__/
+model_output/
