@@ -1,3 +1,4 @@
+import json
 import openai
 import tempfile
 from fastapi import APIRouter, WebSocket
@@ -41,7 +42,8 @@ async def process_audio_to_function(request: AudioRequest) -> dict:
     
     except Exception as e:
         return {"status": "error", "message": str(e)}
-    
+  
+### 사진 댓글용   
 @router.post("/text")
 async def process_audio_to_text(request: AudioRequest) -> dict:
     """
@@ -66,8 +68,8 @@ async def process_audio_to_text(request: AudioRequest) -> dict:
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-#### 실시간 STT
-@router.websocket("/ws-process")
+#### WebSocket - STT
+@router.websocket("/ws-text")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("✅ WebSocket 클라이언트 연결됨!")
@@ -90,6 +92,45 @@ async def websocket_endpoint(websocket: WebSocket):
             
             # 클라이언트에게 텍스트 전송
             await websocket.send_text(whisper_response)
+            print("✅ 변환된 텍스트 전송 완료!")
+
+    except Exception as e:
+        print(f"❌ WebSocket 오류 발생: {e}")
+    finally:
+        await websocket.close()
+        
+### WebSocket - GPT Function call
+@router.websocket("/ws-process")
+async def websocket_audio_to_function(websocket: WebSocket):
+    await websocket.accept()
+    print("✅ WebSocket 클라이언트 연결됨!")
+
+    try:
+        while True:
+            data = await websocket.receive_bytes()
+            if not data:
+                print("🔍 [DEBUG] 받은 데이터 없음. 연결 종료")
+                break
+
+            # 임시 파일 저장
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".m4a") as temp_audio:
+                temp_audio.write(data)
+                temp_audio_path = temp_audio.name
+            print(f"✅ 음성 파일 저장 완료: {temp_audio_path}")
+
+            # Whisper 변환
+            whisper_response = whisper_service.transcribe_audio(temp_audio_path)
+            
+            # GPT를 사용한 추가 처리 수행
+            functions = get_function_list()
+            gpt_response = await gpt_service.process_with_functions(whisper_response, functions)
+            
+            # WebSocket 전송 전에 JSON 문자열로 변환
+            if isinstance(gpt_response, dict):  
+                        gpt_response = json.dumps(gpt_response)  # JSON 문자열 변환
+            
+            # 클라이언트에게 텍스트 전송
+            await websocket.send_text(gpt_response)
             print("✅ 변환된 텍스트 전송 완료!")
 
     except Exception as e:
