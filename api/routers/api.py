@@ -8,7 +8,6 @@ from api.services import gpt_service, whisper_service
 from api.functions.function_registry import get_function_list
 from api.config import settings
 
-
 router = APIRouter()
 client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
 
@@ -42,8 +41,8 @@ async def process_audio_to_function(request: AudioRequest) -> dict:
     
     except Exception as e:
         return {"status": "error", "message": str(e)}
-  
-### 사진 댓글용   
+    
+### 사진 댓글용 
 @router.post("/text")
 async def process_audio_to_text(request: AudioRequest) -> dict:
     """
@@ -127,10 +126,10 @@ async def websocket_audio_to_function(websocket: WebSocket):
             
             # WebSocket 전송 전에 JSON 문자열로 변환
             if isinstance(gpt_response, dict):  
-                        gpt_response = json.dumps(gpt_response)  # JSON 문자열 변환
+                result = json.dumps(gpt_response)  # JSON 문자열 변환
             
             # 클라이언트에게 텍스트 전송
-            await websocket.send_text(gpt_response)
+            await websocket.send_text(result)
             print("✅ 변환된 텍스트 전송 완료!")
 
     except Exception as e:
