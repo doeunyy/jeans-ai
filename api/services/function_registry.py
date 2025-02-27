@@ -25,8 +25,8 @@ FRONT_PATHS = {
     "home": "/Home/main-page",
     
     ### 사진 편집
-    "photo_editing": "/Makeup/select-function",
-    "bestcut": "",
+    "photo_editing": "/MakeUp/select-function",
+    "bestcut": "/MakeUp/selecet-function",
     "default_correction": "",
     "quote_generation": "",
     
