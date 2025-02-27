@@ -1,12 +1,16 @@
+import io
 import json
 import openai
 import tempfile
 from fastapi import APIRouter, WebSocket
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
+from fastapi.responses import JSONResponse
 from transformers import WhisperForConditionalGeneration, WhisperProcessor
-from api.services import gpt_service, whisper_service
+from api.services import gpt_service, whisper_service, basic_edit
 from api.functions.function_registry import get_function_list
 from api.config import settings
+from typing import Optional
+
 
 router = APIRouter()
 client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
@@ -88,7 +92,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Whisper 변환
             whisper_response = whisper_service.transcribe_audio(temp_audio_path)
-            
+        
             # 클라이언트에게 텍스트 전송
             await websocket.send_text(whisper_response)
             print("✅ 변환된 텍스트 전송 완료!")
@@ -131,6 +135,7 @@ async def websocket_audio_to_function(websocket: WebSocket):
             # 클라이언트에게 텍스트 전송
             await websocket.send_text(result)
             print("✅ 변환된 텍스트 전송 완료!")
+            print(f"gpt_respons = {result}")
 
     except Exception as e:
         print(f"❌ WebSocket 오류 발생: {e}")
@@ -138,54 +143,85 @@ async def websocket_audio_to_function(websocket: WebSocket):
         await websocket.close()
 
 
-### 파인튜닝된 모델 로드
-# MODEL_PATH = "./whisper/model_finetuned/whisper-small-2025-02-23_1123"
-# device = "cuda" if torch.cuda.is_available() else "cpu"
-# model, processor, _ = whisper_service.load_finetuned_model(MODEL_PATH, device)
+###################################################
+# 사진 보정
+###################################################
 
-# @router.post("/process")
-# async def process_audio_to_function(request: AudioRequest) -> dict:
-#     """
-#     파인튜닝된 Whisper 모델을 사용하여 음성 파일을 텍스트로 변환한 후 GPT 처리로 전달하는 함수.
-#     :param request: 변환할 음성 파일 경로가 포함된 요청
-#     :return: 변환된 텍스트를 포함한 JSON 형식의 응답
-#     """
-#     try:
-#         # Whisper를 사용한 변환 수행 (파인튜닝된 모델 사용)
-#         whisper_response = whisper_service.transcribe_with_finetuned_model(model, processor, request.file_path, device)
+class ImageEditRequest(BaseModel):
+    image_url: HttpUrl
+    apply_grayscale: Optional[bool] = False
+    apply_contrast: Optional[bool] = False
+    apply_sharpen: Optional[bool] = False
 
-#         if whisper_response["status"] != "success":
-#             return whisper_response  # 오류 발생 시 바로 반환
-
-#         result = whisper_response["text"]
-#         print(f"🔍 [DEBUG] 변환된 텍스트: {result}")
-
-#         # GPT를 사용한 추가 처리 수행
-#         functions = get_function_list()
-#         gpt_response = await gpt_service.process_with_functions(result, functions)
-
-#         return gpt_response
-
-#     except Exception as e:
-#         return {"status": "error", "message": str(e)}
+@router.post("/photo/basic")
+async def edit_photo(request: ImageEditRequest):
+    """ 입력된 이미지 URL과 옵션 값을 이용하여 기본 보정 수행 """
+    try:
+        edited_image_path = basic_edit.apply_basic_edit(
+            image_url=str(request.image_url),
+            apply_grayscale=request.apply_grayscale,
+            apply_contrast=request.apply_contrast,
+            apply_sharpen=request.apply_sharpen
+        )
+        return {"edited_image_path": edited_image_path}
+    except Exception as e:
+        return {"error": str(e)}
+    
 
 
-# @router.post("/text")
-# async def process_audio_to_text(request: AudioRequest) -> dict:
-#     """
-#     파인튜닝된 Whisper 모델을 사용하여 음성 파일을 텍스트로 변환한 후 GPT 처리로 전달하는 함수.
-#     :param request: 변환할 음성 파일 경로가 포함된 요청
-#     :return: 변환된 텍스트를 포함한 JSON 형식의 응답
-#     """
-#     try:
-#         # Whisper를 사용한 변환 수행 (파인튜닝된 모델 사용)
-#         whisper_response = whisper_service.transcribe_with_finetuned_model(model, processor, request.file_path, device)
 
-#         if whisper_response["status"] != "success":
-#             return whisper_response  # 오류 발생 시 바로 반환
 
-#         result = whisper_response["text"]
-#         return result
 
-#     except Exception as e:
-#         return {"status": "error", "message": str(e)}
+
+
+# ### 파인튜닝된 모델 로드
+# # MODEL_PATH = "./whisper/model_finetuned/whisper-small-2025-02-23_1123"
+# # device = "cuda" if torch.cuda.is_available() else "cpu"
+# # model, processor, _ = whisper_service.load_finetuned_model(MODEL_PATH, device)
+
+# # @router.post("/process")
+# # async def process_audio_to_function(request: AudioRequest) -> dict:
+# #     """
+# #     파인튜닝된 Whisper 모델을 사용하여 음성 파일을 텍스트로 변환한 후 GPT 처리로 전달하는 함수.
+# #     :param request: 변환할 음성 파일 경로가 포함된 요청
+# #     :return: 변환된 텍스트를 포함한 JSON 형식의 응답
+# #     """
+# #     try:
+# #         # Whisper를 사용한 변환 수행 (파인튜닝된 모델 사용)
+# #         whisper_response = whisper_service.transcribe_with_finetuned_model(model, processor, request.file_path, device)
+
+# #         if whisper_response["status"] != "success":
+# #             return whisper_response  # 오류 발생 시 바로 반환
+
+# #         result = whisper_response["text"]
+# #         print(f"🔍 [DEBUG] 변환된 텍스트: {result}")
+
+# #         # GPT를 사용한 추가 처리 수행
+# #         functions = get_function_list()
+# #         gpt_response = await gpt_service.process_with_functions(result, functions)
+
+# #         return gpt_response
+
+# #     except Exception as e:
+# #         return {"status": "error", "message": str(e)}
+
+
+# # @router.post("/text")
+# # async def process_audio_to_text(request: AudioRequest) -> dict:
+# #     """
+# #     파인튜닝된 Whisper 모델을 사용하여 음성 파일을 텍스트로 변환한 후 GPT 처리로 전달하는 함수.
+# #     :param request: 변환할 음성 파일 경로가 포함된 요청
+# #     :return: 변환된 텍스트를 포함한 JSON 형식의 응답
+# #     """
+# #     try:
+# #         # Whisper를 사용한 변환 수행 (파인튜닝된 모델 사용)
+# #         whisper_response = whisper_service.transcribe_with_finetuned_model(model, processor, request.file_path, device)
+
+# #         if whisper_response["status"] != "success":
+# #             return whisper_response  # 오류 발생 시 바로 반환
+
+# #         result = whisper_response["text"]
+# #         return result
+
+# #     except Exception as e:
+# #         return {"status": "error", "message": str(e)}
