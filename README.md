@@ -1,8 +1,20 @@
 # 👖 Jeans: AI-Based Photo Editing and Sharing Service for Seniors
 
+### 🏆 **Awards**
+- **Personal Excellence Award** — SK Telecom FLY AI Challenger Program  
+- **Project Excellence Award** — SK Telecom FLY AI Challenger Program
+
+> ### **TL;DR**
+> - Built an **AI-powered photo editing and sharing service for seniors** to improve digital accessibility
+> - Led the entire **AI pipeline as the sole AI engineer**, from data collection to deployment
+> - Fine-tuned **Whisper for Korean dialect speech**, integrated **YOLO + FaceNet** for face enhancement
+> - Deployed a **production-ready FastAPI inference server on AWS** with CI/CD automation
+
+
+<br>
+
 This repository contains **the AI component of *Jeans***, an AI-powered photo editing and sharing service designed to increase digital accessibility and social participation among seniors.
-The project was awarded the **Excellence Prize** at the _SK Telecom FLY AI Challenger Program_, one of South Korea’s leading national AI innovation competitions.
-I served as the **sole AI engineer**, responsible for designing and implementing the entire machine learning pipeline.
+I served as the **sole AI engineer**, responsible for designing and implementing the **end-to-end machine learning pipeline**, from data preparation and model fine-tuning to API design and cloud deployment.
 
 ## Table of Contents
 
