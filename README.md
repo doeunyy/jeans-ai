@@ -10,6 +10,9 @@
 > - Fine-tuned **Whisper for Korean dialect speech**, integrated **YOLO + FaceNet** for face enhancement
 > - Deployed a **production-ready FastAPI inference server on AWS** with CI/CD automation
 
+<br>
+
+<img width="2667" height="1500" alt="열정4팀_최종발표-01" src="https://github.com/user-attachments/assets/cd558ebd-a16a-4d89-8687-56213633f301" />
 
 <br>
 
@@ -29,9 +32,6 @@ I served as the **sole AI engineer**, responsible for designing and implementing
 ---
 
 ## Overview
-
-<img width="2667" height="1500" alt="열정4팀_최종발표-01" src="https://github.com/user-attachments/assets/cd558ebd-a16a-4d89-8687-56213633f301" />
-
 
 **Jeans** is a senior-friendly photo editing and sharing application powered by multimodal AI. The service enables seniors to edit photos using **voice commands**, automatically detect and enhance faces, and share images easily with family and friends.
 
